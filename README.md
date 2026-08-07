@@ -6,7 +6,7 @@ Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented
 
 
 **Prerequisites:**
-* **Java 21** or higher (adjust to your actual requirement)
+* **Java 17** or higher (adjust to your actual requirement)
 * **Ollama** installed and running on your machine (or accessible via network).
 
 

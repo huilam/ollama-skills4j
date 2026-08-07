@@ -1,5 +1,7 @@
 package hl.llm.skills4j.ollama;
 
+import java.util.Map;
+
 import io.github.ollama4j.models.response.OllamaResult;
 
 public class Skill {
@@ -50,11 +52,16 @@ public class Skill {
 			if(!isQueitly)
 			{
 				System.out.println("Executing skill:["+skillConfig.getSkill_name()+"] ...");
-				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+llmclient.getHost()+FONT_DEF);
-				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+llmclient.getModel_name()+FONT_DEF);
-				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " ")+FONT_DEF);
-				System.out.println();
-			}
+				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+llmclient.getHost());
+				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+llmclient.getModel_name());
+				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " "));
+				Map<String, Object> optionsMap = llmclient.getLLM_options().getOptionsMap();
+				System.out.println("  - "+FONT_COLOR+"llmOptions: "+FONT_DEF+optionsMap.size());
+				for(Map.Entry<String, Object> entry : optionsMap.entrySet())
+				{
+					System.out.println("      * "+entry.getKey()+": "+entry.getValue());
+				}
+				System.out.println();			}
 			OllamaResult response = llmclient.sendRequest(aUserPrompt);
 			return response.getResponse();
 		}

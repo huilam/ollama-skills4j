@@ -166,7 +166,7 @@ public class OllamaSkillsMgr {
 			String[] sLLMOptions = new String[] {"topK", "topP", "temperature", "repeatPenalty", "seed"};
 			for(String sOpt : sLLMOptions)
 			{
-				String sPropKey = sSkillReqPrefix+"options."+sOpt;
+				String sPropKey = sSkillPrefix+"options."+sOpt;
 				String sVal = prop.getProperty(sPropKey, null);
 				if(sVal!=null && sVal.trim().length()>0)
 				{
@@ -175,16 +175,16 @@ public class OllamaSkillsMgr {
 						
 						switch(sOpt.toLowerCase())
 						{
-							case "topK":
+							case "topk":
 								skillConfig.setLLM_Options_topK((int)fVal);
 								break;
-							case "topP":
+							case "topp":
 								skillConfig.setLLM_Options_topP(fVal);
 								break;
 							case "temperature":
 								skillConfig.setLLM_Options_temperature(fVal);
 								break;
-							case "repeatPenalty":
+							case "repeatpenalty":
 								skillConfig.setLLM_Options_repeatPenalty(fVal);
 								break;
 							case "seed":
