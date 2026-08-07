@@ -1,1 +1,1 @@
-# hl-ollama-skill4j
+# ollama-skills4j
