@@ -8,7 +8,7 @@ import hl.common.PropUtil;
 public class OllamaSkillsMgr {
 	
 	private String frameworkPropFileName 			= "ollama-skills4j.properties";
-	private static String frameworkPropPrefix 		= "ollama-skill4j.";
+	private static String frameworkPropPrefix 		= "ollama-skills4j.";
 	private static String DEF_skill_config_filename = "skill4j.properties";
 	
 	private static String DEF_ollama_host 	= "http://localhost:11434";
@@ -75,9 +75,15 @@ public class OllamaSkillsMgr {
 				Skill ollamaSkill = new Skill(skillConfig);
 				return ollamaSkill;
 			}
+			else
+			{
+				System.err.println("Failed to initialise Skill:["+aSkillName+"] properties file - "+ sSkillPropFileName);
+			}
 		}
-		
-		System.err.println("Skill not found: ["+aSkillName+"]");
+		else
+		{
+			System.err.println("Skill folder not found in classpath: ["+aSkillName+"]");
+		}
 		return null;
 	}
 	
