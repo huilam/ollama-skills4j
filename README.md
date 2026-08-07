@@ -1,6 +1,6 @@
 ## ollama-skills4j
 
-An Simple Ollama Skills framework for Java. 
+A Simple Ollama Skills framework for Java. 
 
 Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented in Core Java, this library provides a lightweight, easy-to-use framework with a footprint of **less than 6MB**.
 
