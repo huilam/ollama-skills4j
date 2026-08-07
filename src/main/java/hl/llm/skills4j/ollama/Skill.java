@@ -45,12 +45,14 @@ public class Skill {
 	{
 		if(llmclient!=null && aUserPrompt!=null && aUserPrompt.trim().length()>0)
 		{
+			String FONT_COLOR = OllamaSkillsMgr.CLI_FONT_BLACK;
+			String FONT_DEF = OllamaSkillsMgr.CLI_FONT_DEF;
 			if(!isQueitly)
 			{
 				System.out.println("Executing skill:["+skillConfig.getSkill_name()+"] ...");
-				System.out.println("  - host: "+llmclient.getHost());
-				System.out.println("  - model: "+llmclient.getModel_name());
-				System.out.println("  - userPrompt: "+aUserPrompt.replaceAll("\n", " "));
+				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+llmclient.getHost()+FONT_DEF);
+				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+llmclient.getModel_name()+FONT_DEF);
+				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " ")+FONT_DEF);
 				System.out.println();
 			}
 			OllamaResult response = llmclient.sendRequest(aUserPrompt);

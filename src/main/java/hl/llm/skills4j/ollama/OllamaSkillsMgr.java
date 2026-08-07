@@ -7,6 +7,12 @@ import hl.common.PropUtil;
 
 public class OllamaSkillsMgr {
 	
+	public static String CLI_FONT_DEF 	= "\u001B[0m";
+	public static String CLI_FONT_BLACK = "\u001B[1;30m";
+	public static String CLI_FONT_RED 	= "\u001B[31m";
+	public static String CLI_FONT_GREEN = "\u001B[32m";
+	public static String CLI_FONT_BLUE 	= "\u001B[34m";
+	
 	private String frameworkPropFileName 			= "ollama-skills4j.properties";
 	private static String frameworkPropPrefix 		= "ollama-skills4j.";
 	private static String DEF_skill_config_filename = "skill4j.properties";
@@ -55,9 +61,50 @@ public class OllamaSkillsMgr {
 			return PropUtil.loadProperties(aPropFileName);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public String getTemplFrameworkProperties(String aSkillNameCandidate)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(CLI_FONT_GREEN);
+		sb.append("########################################").append("\n");
+		sb.append("# ollama-skills4j.[skill-name].folder=[skill-name]").append("\n");
+		sb.append("# ollama-skills4j.[skill-name].optional.properties=skill4j.properties").append("\n");
+		sb.append("########################################").append("\n");
+		sb.append("\n");
+		sb.append("ollama-skills4j.").append(aSkillNameCandidate).append(".folder=").append(aSkillNameCandidate).append("\n");
+		sb.append("#ollama-skills4j.").append(aSkillNameCandidate).append(".optional.properties=").append(aSkillNameCandidate).append("-skill4j.properties").append("\n");
+		sb.append("\n");
+		sb.append("##-END-#################################").append("\n");
+		sb.append(CLI_FONT_DEF);
+		return sb.toString();
+	}
+	
+	public String getTemplSkill4jProperties(String aSkillNameCandidate)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(CLI_FONT_GREEN);
+		sb.append("########################################").append("\n");
+		sb.append("# skill4j.llm.host=").append("http://localhost:11434").append("\n");
+		sb.append("# skill4j.llm.request.model=").append("phi4-mini:3.8b").append("\n");
+		sb.append("# skill4j.llm.request.timeout=").append("30").append("\n");
+		sb.append("# skill4j.llm.request.system-prompt=").append("${file:"+aSkillNameCandidate+".system-prompt}").append("\n");
+		sb.append("#").append("\n");
+		sb.append("# skill4j.llm.options.topK=").append("40").append("\n");
+		sb.append("# skill4j.llm.options.topP=").append("0.9").append("\n");
+		sb.append("# skill4j.llm.options.temperature=").append("0.7").append("\n");
+		sb.append("# skill4j.llm.options.repeatPenalty=").append("1.1").append("\n");
+		sb.append("# skill4j.llm.options.seed=").append("42").append("\n");
+		sb.append("########################################").append("\n");
+		sb.append("\n");
+		sb.append("skill4j.llm.host=").append("http://localhost:11434").append("\n");
+		sb.append("\n");
+		sb.append("##-END-#################################").append("\n");
+		sb.append(CLI_FONT_DEF);
+		return sb.toString();
 	}
 	
 	public Skill getOllamaSkill(final String aSkillName)
@@ -77,12 +124,20 @@ public class OllamaSkillsMgr {
 			}
 			else
 			{
-				System.err.println("Failed to initialise Skill:["+aSkillName+"] properties file - "+ sSkillPropFileName);
+				System.err.println("Failed to initialise Skill:["+aSkillName+"], error loading properties file - "+ sSkillPropFileName);
+				System.out.println("");
+				System.out.println("Generating template for ["+sSkillPropFileName+"] ...");
+				System.out.println("");
+				System.out.println(getTemplSkill4jProperties(aSkillName));
 			}
 		}
 		else
 		{
 			System.err.println("Skill folder not found in classpath: ["+aSkillName+"]");
+			System.out.println("");
+			System.out.println("Generating template for ["+frameworkPropFileName+"] ...");
+			System.out.println("");
+			System.out.println(getTemplFrameworkProperties(aSkillName));
 		}
 		return null;
 	}
@@ -111,24 +166,25 @@ public class OllamaSkillsMgr {
 			String[] sLLMOptions = new String[] {"topK", "topP", "temperature", "repeatPenalty", "seed"};
 			for(String sOpt : sLLMOptions)
 			{
-				String sVal = prop.getProperty(sSkillReqPrefix+"options."+sOpt, null);
+				String sPropKey = sSkillReqPrefix+"options."+sOpt;
+				String sVal = prop.getProperty(sPropKey, null);
 				if(sVal!=null && sVal.trim().length()>0)
 				{
 					try {
 						float fVal = Float.parseFloat(sVal); // validate number
 						
-						switch(sOpt)
+						switch(sOpt.toLowerCase())
 						{
-							case "top_k":
+							case "topK":
 								skillConfig.setLLM_Options_topK((int)fVal);
 								break;
-							case "top_p":
+							case "topP":
 								skillConfig.setLLM_Options_topP(fVal);
 								break;
 							case "temperature":
 								skillConfig.setLLM_Options_temperature(fVal);
 								break;
-							case "repeat_penalty":
+							case "repeatPenalty":
 								skillConfig.setLLM_Options_repeatPenalty(fVal);
 								break;
 							case "seed":
@@ -136,7 +192,7 @@ public class OllamaSkillsMgr {
 								break;
 						}
 					}catch (NumberFormatException e) {
-						e.printStackTrace();
+						System.err.println("Error llm.option: "+sPropKey+"="+sVal);
 					}
 				}
 			}
