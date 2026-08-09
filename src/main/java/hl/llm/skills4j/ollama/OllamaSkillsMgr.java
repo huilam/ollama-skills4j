@@ -1,9 +1,11 @@
 package hl.llm.skills4j.ollama;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import hl.common.PropUtil;
+import io.github.ollama4j.models.response.OllamaResult;
 
 public class OllamaSkillsMgr {
 	
@@ -22,6 +24,8 @@ public class OllamaSkillsMgr {
 	private static String DEF_model_name 	= "";
 	
 	private Properties propSkillConfig = null;
+	public boolean isDebugMode 	= false;
+	public boolean isSilentMode = false;
 	
 	
 	public OllamaSkillsMgr() {
@@ -31,6 +35,22 @@ public class OllamaSkillsMgr {
 	public OllamaSkillsMgr(String aPropFileName) {
 		this.frameworkPropFileName = aPropFileName;
 		propSkillConfig = loadProperties(this.frameworkPropFileName);
+	}
+
+	public boolean isDebugMode() {
+		return isDebugMode;
+	}
+
+	public void setDebugMode(boolean aIsDebugMode) {
+		isDebugMode = aIsDebugMode;
+	}
+
+	public boolean isSilentMode() {
+		return isSilentMode;
+	}
+
+	public void setSilentMode(boolean isSilentMode) {
+		this.isSilentMode = isSilentMode;
 	}
 
 	public Properties getOllamaPropForSkill(String sSkillName)
@@ -202,15 +222,65 @@ public class OllamaSkillsMgr {
 		return null;
 	}
 	
+
+	public String execute(Skill aSkill, String aUserPrompt) throws Exception
+	{
+		String sResult = null;
+		
+		LLMClient llmclient = aSkill.getLLMClient();
+		SkillConfig skillConfig = aSkill.getSkillConfig();
+		
+		if(llmclient!=null && aUserPrompt!=null && aUserPrompt.trim().length()>0)
+		{
+			String FONT_COLOR = OllamaSkillsMgr.CLI_FONT_BLACK;
+			String FONT_DEF = OllamaSkillsMgr.CLI_FONT_DEF;
+			if(!isSilentMode)
+			{
+				System.out.println("Executing "+FONT_COLOR+"skill:["+FONT_DEF+skillConfig.getSkill_name()+FONT_COLOR+"]"+FONT_DEF+" ...");
+				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+llmclient.getHost());
+				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+llmclient.getModel_name());
+				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " "));
+				Map<String, Object> optionsMap = llmclient.getLLM_options().getOptionsMap();
+				System.out.println("  - "+FONT_COLOR+"llmOptions: "+FONT_DEF+optionsMap.size());
+				
+				if(isDebugMode)
+				{
+					for(Map.Entry<String, Object> entry : optionsMap.entrySet())
+					{
+						System.out.println("      * "+entry.getKey()+": "+entry.getValue());
+					}
+					
+				}
+			}
+			long lTimeMs = System.currentTimeMillis();
+			OllamaResult response = llmclient.sendRequest(aUserPrompt);
+			sResult = response.getResponse();
+			lTimeMs = System.currentTimeMillis() - lTimeMs;
+			if(!isSilentMode)
+			{
+				if(isDebugMode)
+				{
+					//System.out.println("  - "+FONT_COLOR+"response: "+FONT_DEF+sResult.replaceAll("\n", " "));
+				}
+				System.out.println("  - "+FONT_COLOR+"elapsedTime: "+FONT_DEF+lTimeMs+" ms");
+				System.out.println();
+			}
+		}
+		return sResult;
+	}
+	
 	public static void main(String args[]) throws Exception
 	{
 		OllamaSkillsMgr skillsMgr = new OllamaSkillsMgr();
-		Skill skill = skillsMgr.getOllamaSkill("hello");
 		
+		skillsMgr.setSilentMode(false);
+		skillsMgr.setDebugMode(true);
+		
+		Skill skill = skillsMgr.getOllamaSkill("hello");
 		if(skill!=null)
 		{
-			String userprompt = "Explain what "+skill.getSkillName()+" is in two short sentences.";
-			System.out.println(skill.execute(userprompt));
+			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
+			System.out.println(skillsMgr.execute(skill, userprompt));
 		}
 	}
 }
