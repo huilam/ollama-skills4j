@@ -130,13 +130,28 @@ public class OllamaSkillsMgr {
 	public Skill getOllamaSkill(final String aSkillName)
 	{
 		String sSkillfolder = propSkillConfig.getProperty(frameworkPropPrefix+aSkillName+".folder");
-		if(sSkillfolder!=null)
+		return getOllamaSkill(aSkillName, sSkillfolder);
+	}
+	
+	public Skill getOllamaSkill(final String aSkillName, final String aSkillFolderPath)
+	{
+		String sSkillPropFileName = null;
+		if(aSkillFolderPath!=null)
 		{
-			String sSkillPropFileName = propSkillConfig.getProperty(
+			sSkillPropFileName = propSkillConfig.getProperty(
 					frameworkPropPrefix+aSkillName+".optional.properties",
 					DEF_skill_config_filename);
+		}
+		return getOllamaSkill(aSkillName, aSkillFolderPath, sSkillPropFileName);
+	}
+	
+	protected Skill getOllamaSkill(final String aSkillName, final String aSkillFolderPath,  final String aSkillPropFileName)
+	{
+		if(aSkillFolderPath!=null && aSkillPropFileName!=null)
+		{
+			String sSkillPropFileName = aSkillPropFileName;
 			//
-			SkillConfig skillConfig = getSkillConfig(sSkillfolder, sSkillPropFileName);
+			SkillConfig skillConfig = getSkillConfig(aSkillFolderPath, sSkillPropFileName);
 			if(skillConfig!=null)
 			{
 				Skill ollamaSkill = new Skill(skillConfig);
@@ -227,21 +242,20 @@ public class OllamaSkillsMgr {
 	{
 		String sResult = null;
 		
-		LLMClient llmclient = aSkill.getLLMClient();
-		SkillConfig skillConfig = aSkill.getSkillConfig();
-		
-		if(llmclient!=null && aUserPrompt!=null && aUserPrompt.trim().length()>0)
+		if(aSkill!=null && aUserPrompt!=null && aUserPrompt.trim().length()>0)
 		{
 			String FONT_COLOR = OllamaSkillsMgr.CLI_FONT_BLACK;
 			String FONT_DEF = OllamaSkillsMgr.CLI_FONT_DEF;
 			if(!isSilentMode)
 			{
-				System.out.println("Executing "+FONT_COLOR+"skill:["+FONT_DEF+skillConfig.getSkill_name()+FONT_COLOR+"]"+FONT_DEF+" ...");
-				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+llmclient.getHost());
-				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+llmclient.getModel_name());
+				SkillConfig skillConfig = aSkill.getSkillConfig();
+				
+				System.out.println("Executing "+FONT_COLOR+"skill:["+FONT_DEF+aSkill.getSkillName()+FONT_COLOR+"]"+FONT_DEF+" ...");
+				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+skillConfig.getOllama_host());
+				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+skillConfig.getOllama_model_name());
 				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " "));
-				Map<String, Object> optionsMap = llmclient.getLLM_options().getOptionsMap();
-				System.out.println("  - "+FONT_COLOR+"llmOptions: "+FONT_DEF+optionsMap.size());
+				Map<String, Object> optionsMap = skillConfig.getLLM_options().getOptionsMap();
+				System.out.println("  - "+FONT_COLOR+"customOptions: "+FONT_DEF+optionsMap.size());
 				
 				if(isDebugMode)
 				{
@@ -253,7 +267,7 @@ public class OllamaSkillsMgr {
 				}
 			}
 			long lTimeMs = System.currentTimeMillis();
-			OllamaResult response = llmclient.sendRequest(aUserPrompt);
+			OllamaResult response = aSkill.sendRequest(aUserPrompt);
 			sResult = response.getResponse();
 			lTimeMs = System.currentTimeMillis() - lTimeMs;
 			if(!isSilentMode)
@@ -280,6 +294,17 @@ public class OllamaSkillsMgr {
 		if(skill!=null)
 		{
 			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
+			System.out.println();
+			System.out.println(skillsMgr.execute(skill, userprompt));
+		}
+		
+		if(skill!=null)
+		{
+			SkillConfig config = skill.getSkillConfig();
+			config.setOllama_model_name("qwen2.5-coder:1.5b-instruct-q4_K_M");
+			config.setLLM_Options_temperature(0.5f);
+			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
+			System.out.println();
 			System.out.println(skillsMgr.execute(skill, userprompt));
 		}
 	}

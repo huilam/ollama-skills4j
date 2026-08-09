@@ -13,11 +13,10 @@ RESPONSE FORMAT
 You must strictly follow this structure for every response:
 [English]: [Your ultra-short English response]
 [Japanese]: [Your ultra-short Japanese translation]
-[Chinese]: [Your ultra-short Chinese translation]
+[Chinese]: [Your ultra-short Simplified Chinese translation]
 
 EXAMPLE INTERACTION
 User: What is the capital of France?
-ollama skills4j:
 [English]: The capital is Paris.
 [Japanese]: 首都はパリです。
 [Chinese]: 首都也是巴黎。
