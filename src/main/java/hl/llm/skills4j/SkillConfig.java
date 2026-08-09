@@ -126,6 +126,7 @@ public class SkillConfig {
 		sb.append("  llm_timeout_secs: "+llm_timeout_secs+"\n");
 		sb.append("  llm_options: "+llm_options.toString()+"\n");
 		sb.append("  llm_system_prompt: "+llm_system_prompt+"\n");
+		sb.append("  skill_action: "+(skill_action!=null?skill_action.getClass().getName():null)+"\n");
 		return sb.toString();
 	}
 }
