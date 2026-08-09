@@ -16,7 +16,7 @@ Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented
 
 **Sample Output:**
 
-```
+```text
 Executing [skill:[hello] ...
   - host: mhttp://localhost:11434
   - mmodel: phi4-mini:3.8b-q4_K_M
@@ -32,13 +32,13 @@ Executing [skill:[hello] ...
 [English]: Greeting in English, meaning hello.
 [Japanese]: こんにちは、これは挨拶の意味です。
 [Chinese]: 《你好》，这是问候的意思。
-````
+```
 
 <br>
 
 **Sample Java Code:**
 
-````
+```java
 public static void main(String args[]) throws Exception
 {
 	OllamaSkillsMgr skillsMgr = new OllamaSkillsMgr();
@@ -53,6 +53,15 @@ public static void main(String args[]) throws Exception
 		System.out.println(skillsMgr.execute(skill, userprompt));
 	}
 }
-````
+```
+
+**Sample Skill4j.propeties File:**
+
+```text
+skill4j.llm.host=http://localhost:11434
+skill4j.llm.request.model-name=phi4-mini:3.8b-q4_K_M
+skill4j.llm.request.timeout-secs=200
+skill4j.llm.request.system-prompt=${file:hello.system-prompt}
+```
 
 <br>

@@ -260,7 +260,7 @@ public class OllamaSkillsMgr {
 			{
 				if(isDebugMode)
 				{
-					//System.out.println("  - "+FONT_COLOR+"response: "+FONT_DEF+sResult.replaceAll("\n", " "));
+					System.out.println("  - "+FONT_COLOR+"response: "+FONT_DEF+sResult.replaceAll("\n", " ").replaceAll("\s{2,}", " "));
 				}
 				System.out.println("  - "+FONT_COLOR+"elapsedTime: "+FONT_DEF+lTimeMs+" ms");
 				System.out.println();
