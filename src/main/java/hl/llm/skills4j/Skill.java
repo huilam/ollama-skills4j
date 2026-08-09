@@ -29,8 +29,6 @@ public class Skill {
 		try {
 			return client.ping();
 		} catch (OllamaException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -42,6 +40,9 @@ public class Skill {
 	
 	public OllamaResult sendRequest(String userprompt, OllamaGenerateStreamObserver streamObserver) throws OllamaException{
         
+		if(isOllamaReady()==false)
+			throw new OllamaException("Ollama is not ready. Please check the host and ensure Ollama is running.");
+		
 		SkillConfig config = this.skillConfig;
 		ISkill4jAction skillAction = config.getSkill_action();
 		

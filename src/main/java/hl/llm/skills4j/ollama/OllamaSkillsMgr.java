@@ -114,6 +114,7 @@ public class OllamaSkillsMgr {
 		sb.append("# skill4j.llm.request.model=").append("phi4-mini:3.8b").append("\n");
 		sb.append("# skill4j.llm.request.timeout=").append("30").append("\n");
 		sb.append("# skill4j.llm.request.system-prompt=").append("${file:"+aSkillNameCandidate+".system-prompt}").append("\n");
+		sb.append("# skill4j.action.implementation=").append("\n");
 		sb.append("#").append("\n");
 		sb.append("# skill4j.llm.options.topK=").append("40").append("\n");
 		sb.append("# skill4j.llm.options.topP=").append("0.9").append("\n");
@@ -184,11 +185,11 @@ public class OllamaSkillsMgr {
 		Properties prop = loadProperties(aSkillFolder+"/"+aSkillPropFileName);
 		if(prop!=null)
 		{
-			String sSkillPrefix = "skill4j.llm.";
-			String sSkillReqPrefix = sSkillPrefix+"request.";
+			String sSkillPrefix = "skill4j.";
+			String sSkillReqPrefix = sSkillPrefix+"llm.request.";
 			//
 			SkillConfig skillConfig = new SkillConfig(aSkillFolder);
-			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"host", DEF_ollama_host));
+			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"llm.host", DEF_ollama_host));
 			skillConfig.setLLM_model_name(prop.getProperty(sSkillReqPrefix+"model-name", DEF_model_name));
 			//
 			skillConfig.setLLM_timeout_secs(prop.getProperty(sSkillReqPrefix+"timeout-secs", DEF_timeout_ms));
@@ -199,11 +200,17 @@ public class OllamaSkillsMgr {
 				skillConfig.setLLM_System_prompt(sSystemPrompt);
 			}
 			//
+			String sActionClassName = prop.getProperty(sSkillPrefix+".action.implementation", null);
+			if(sActionClassName!=null && sActionClassName.trim().length()>0)
+			{
+				skillConfig.setSkill_action_classname(sActionClassName);
+			}
+			//
 			
 			String[] sLLMOptions = new String[] {"topK", "topP", "temperature", "repeatPenalty", "seed"};
 			for(String sOpt : sLLMOptions)
 			{
-				String sPropKey = sSkillPrefix+"options."+sOpt;
+				String sPropKey = sSkillPrefix+"llm.options."+sOpt;
 				String sVal = prop.getProperty(sPropKey, null);
 				if(sVal!=null && sVal.trim().length()>0)
 				{
