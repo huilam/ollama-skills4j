@@ -1,15 +1,17 @@
-package hl.llm.skills4j.ollama;
+package hl.llm.skills4j;
 
+import hl.llm.skills4j.actions.ISkill4jAction;
 import io.github.ollama4j.utils.Options;
 import io.github.ollama4j.utils.OptionsBuilder;
 
 public class SkillConfig {
 	
 	private String skill_name 			= null;
-	private String ollama_host 			= "http://localhost:11434";
-	private String ollama_model_name 	= null;
+	private String llm_host 			= "http://localhost:11434";
+	private String llm_model_name 		= null;
 	private int llm_timeout_secs		= 30;
 	private String llm_system_prompt	= null;
+	private ISkill4jAction skill_action	= null;
 	
 	private OptionsBuilder llm_options 	= new OptionsBuilder();
 	
@@ -23,28 +25,38 @@ public class SkillConfig {
 		return skill_name;
 	}
 	
+	public ISkill4jAction getSkill_action() {
+		return skill_action;
+	}
+
+	public void setSkill_action(ISkill4jAction skill_action) {
+		this.skill_action = skill_action;
+	}
+
 	public void clear() {
-		this.ollama_host 		= "http://localhost:11434";
-		this.ollama_model_name 	= null;
+		this.llm_host 		= "http://localhost:11434";
+		this.llm_model_name 	= null;
 		this.llm_timeout_secs	= 30;
 		this.llm_options		= new OptionsBuilder();
 		this.llm_system_prompt	= null;
+		
+		this.skill_action 		= null;
 	}
 
-	public String getOllama_host() {
-		return ollama_host;
+	public String getLLM_host() {
+		return llm_host;
 	}
 
-	public void setOllama_host(String ollama_host) {
-		this.ollama_host = ollama_host;
+	public void setLLM_host(String llm_host) {
+		this.llm_host = llm_host;
 	}
 
-	public String getOllama_model_name() {
-		return ollama_model_name;
+	public String getLLM_model_name() {
+		return llm_model_name;
 	}
 
-	public void setOllama_model_name(String ollama_model_name) {
-		this.ollama_model_name = ollama_model_name;
+	public void setLLM_model_name(String llm_model_name) {
+		this.llm_model_name = llm_model_name;
 	}
 	
 	////
@@ -109,8 +121,8 @@ public class SkillConfig {
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("SkillConfig: "+skill_name+"\n");
-		sb.append("  ollama_host: "+ollama_host+"\n");
-		sb.append("  ollama_model_name: "+ollama_model_name+"\n");
+		sb.append("  llm_host: "+llm_host+"\n");
+		sb.append("  llm_model_name: "+llm_model_name+"\n");
 		sb.append("  llm_timeout_secs: "+llm_timeout_secs+"\n");
 		sb.append("  llm_options: "+llm_options.toString()+"\n");
 		sb.append("  llm_system_prompt: "+llm_system_prompt+"\n");

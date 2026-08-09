@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import hl.common.PropUtil;
+import hl.llm.skills4j.Skill;
+import hl.llm.skills4j.SkillConfig;
 import io.github.ollama4j.models.response.OllamaResult;
 
 public class OllamaSkillsMgr {
@@ -186,8 +188,8 @@ public class OllamaSkillsMgr {
 			String sSkillReqPrefix = sSkillPrefix+"request.";
 			//
 			SkillConfig skillConfig = new SkillConfig(aSkillFolder);
-			skillConfig.setOllama_host(prop.getProperty(sSkillPrefix+"host", DEF_ollama_host));
-			skillConfig.setOllama_model_name(prop.getProperty(sSkillReqPrefix+"model-name", DEF_model_name));
+			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"host", DEF_ollama_host));
+			skillConfig.setLLM_model_name(prop.getProperty(sSkillReqPrefix+"model-name", DEF_model_name));
 			//
 			skillConfig.setLLM_timeout_secs(prop.getProperty(sSkillReqPrefix+"timeout-secs", DEF_timeout_ms));
 			//
@@ -251,8 +253,8 @@ public class OllamaSkillsMgr {
 				SkillConfig skillConfig = aSkill.getSkillConfig();
 				
 				System.out.println("Executing "+FONT_COLOR+"skill:["+FONT_DEF+aSkill.getSkillName()+FONT_COLOR+"]"+FONT_DEF+" ...");
-				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+skillConfig.getOllama_host());
-				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+skillConfig.getOllama_model_name());
+				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+skillConfig.getLLM_host());
+				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+skillConfig.getLLM_model_name());
 				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " "));
 				Map<String, Object> optionsMap = skillConfig.getLLM_options().getOptionsMap();
 				System.out.println("  - "+FONT_COLOR+"customOptions: "+FONT_DEF+optionsMap.size());
@@ -301,7 +303,7 @@ public class OllamaSkillsMgr {
 		if(skill!=null)
 		{
 			SkillConfig config = skill.getSkillConfig();
-			config.setOllama_model_name("qwen2.5-coder:1.5b-instruct-q4_K_M");
+			config.setLLM_model_name("qwen2.5-coder:1.5b-instruct-q4_K_M");
 			config.setLLM_Options_temperature(0.5f);
 			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
 			System.out.println();

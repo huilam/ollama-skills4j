@@ -1,5 +1,6 @@
-package hl.llm.skills4j.ollama;
+package hl.llm.skills4j;
 
+import hl.llm.skills4j.actions.ISkill4jAction;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.exceptions.OllamaException;
 import io.github.ollama4j.models.generate.OllamaGenerateRequest;
@@ -8,12 +9,11 @@ import io.github.ollama4j.models.response.OllamaResult;
 
 public class Skill {
 	
-	private Ollama client 			= null;
-	private SkillConfig skillConfig = null;
-	
+	private Ollama client 				= null;
+	private SkillConfig skillConfig 	= null;
 	
 	public Skill(SkillConfig aSkillConfig) {
-		this.client = new Ollama(aSkillConfig.getOllama_host());
+		this.client = new Ollama(aSkillConfig.getLLM_host());
 		this.skillConfig = aSkillConfig;
 	}
 	
@@ -24,7 +24,6 @@ public class Skill {
 	public String getSkillName() {
 		return skillConfig.getSkill_name();
 	}
-
 	public boolean isOllamaReady()
 	{
 		try {
@@ -41,12 +40,18 @@ public class Skill {
 		return sendRequest(userprompt, null);
 	}
 	
-	public OllamaResult sendRequest(String userprompt, OllamaGenerateStreamObserver streanObserver) throws OllamaException{
+	public OllamaResult sendRequest(String userprompt, OllamaGenerateStreamObserver streamObserver) throws OllamaException{
         
 		SkillConfig config = this.skillConfig;
+		ISkill4jAction skillAction = config.getSkill_action();
+		
+		if(skillAction!=null)
+        {
+			config = skillAction.doPreExecute(config, userprompt);
+        }
 		
 		OllamaGenerateRequest request = OllamaGenerateRequest.builder()
-                .withModel(config.getOllama_model_name())
+                .withModel(config.getLLM_model_name())
                 .withPrompt(userprompt);
         
         if(config.getLLM_System_prompt()!=null)
@@ -58,7 +63,15 @@ public class Skill {
         if(config.getLLM_options()!=null)
         	request.setOptions(config.getLLM_options().getOptionsMap());
         
-        return client.generate(request.build(), streanObserver);
+        ///
+        OllamaResult ollamaResult = client.generate(request.build(), streamObserver);
+        
+        if(skillAction!=null)
+        {
+        	ollamaResult = skillAction.doPostExecute(config, userprompt , ollamaResult);
+		}
+        
+        return ollamaResult;
 	}
 	
 }
