@@ -200,7 +200,7 @@ public class OllamaSkillsMgr {
 				skillConfig.setLLM_System_prompt(sSystemPrompt);
 			}
 			//
-			String sActionClassName = prop.getProperty(sSkillPrefix+".action.implementation", null);
+			String sActionClassName = prop.getProperty(sSkillPrefix+"action.implementation", null);
 			if(sActionClassName!=null && sActionClassName.trim().length()>0)
 			{
 				skillConfig.setSkill_action_classname(sActionClassName);

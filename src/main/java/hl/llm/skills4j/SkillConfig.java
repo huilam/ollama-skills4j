@@ -38,8 +38,13 @@ public class SkillConfig {
 			Class<?> clazz = Class.forName(aSkill_action_className);
 			Object instance = clazz.getDeclaredConstructor().newInstance();
 			if (instance instanceof ISkill4jAction) {
-				this.skill_action = (ISkill4jAction) instance;
-				setSkill_action((ISkill4jAction) instance);
+				ISkill4jAction actionInstance = (ISkill4jAction) instance;
+				if(actionInstance.init())
+				{
+					this.skill_action = actionInstance;
+					setSkill_action(actionInstance);
+				}
+				
 			} else {
 				throw new IllegalArgumentException("Class " + aSkill_action_className + " does not implement ISkill4jAction.");
 			}

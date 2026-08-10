@@ -48,7 +48,7 @@ public class Skill {
 		
 		if(skillAction!=null)
         {
-			config = skillAction.doPreExecute(config, userprompt);
+			userprompt = skillAction.doPreExecAction(config, userprompt);
         }
 		
 		OllamaGenerateRequest request = OllamaGenerateRequest.builder()
@@ -69,7 +69,7 @@ public class Skill {
         
         if(skillAction!=null)
         {
-        	ollamaResult = skillAction.doPostExecute(config, userprompt , ollamaResult);
+        	ollamaResult = skillAction.doPostExecAction(config, userprompt , ollamaResult);
 		}
         
         return ollamaResult;
