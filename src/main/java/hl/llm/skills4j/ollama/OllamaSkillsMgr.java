@@ -32,11 +32,15 @@ public class OllamaSkillsMgr {
 	
 	public OllamaSkillsMgr() {
 		propSkillConfig = loadProperties(this.frameworkPropFileName);
+		if(propSkillConfig==null)
+			propSkillConfig = new Properties();
 	}
 	
 	public OllamaSkillsMgr(String aPropFileName) {
 		this.frameworkPropFileName = aPropFileName;
 		propSkillConfig = loadProperties(this.frameworkPropFileName);
+		if(propSkillConfig==null)
+			propSkillConfig = new Properties();
 	}
 
 	public boolean isDebugMode() {
@@ -132,29 +136,31 @@ public class OllamaSkillsMgr {
 	
 	public Skill getOllamaSkill(final String aSkillName)
 	{
-		String sSkillfolder = propSkillConfig.getProperty(frameworkPropPrefix+aSkillName+".folder");
+		String sSkillfolder = propSkillConfig.getProperty(frameworkPropPrefix+aSkillName+".folder", null);
 		return getOllamaSkill(aSkillName, sSkillfolder);
 	}
 	
-	public Skill getOllamaSkill(final String aSkillName, final String aSkillFolderPath)
+	public Skill getOllamaSkill(final String aSkillName, String aSkillFolderPath)
 	{
 		String sSkillPropFileName = null;
-		if(aSkillFolderPath!=null)
-		{
-			sSkillPropFileName = propSkillConfig.getProperty(
+		
+		if(aSkillFolderPath==null)
+			aSkillFolderPath = aSkillName; //default skill folder as skill name
+		
+		sSkillPropFileName = propSkillConfig.getProperty(
 					frameworkPropPrefix+aSkillName+".optional.properties",
 					DEF_skill_config_filename);
-		}
+		
 		return getOllamaSkill(aSkillName, aSkillFolderPath, sSkillPropFileName);
 	}
 	
-	protected Skill getOllamaSkill(final String aSkillName, final String aSkillFolderPath,  final String aSkillPropFileName)
+	protected Skill getOllamaSkill(final String aSkillName, String aSkillFolderPath,  final String aSkillPropFileName)
 	{
 		if(aSkillFolderPath!=null && aSkillPropFileName!=null)
 		{
 			String sSkillPropFileName = aSkillPropFileName;
 			//
-			SkillConfig skillConfig = getSkillConfig(aSkillFolderPath, sSkillPropFileName);
+			SkillConfig skillConfig = getSkillConfig(aSkillName, aSkillFolderPath, sSkillPropFileName);
 			if(skillConfig!=null)
 			{
 				Skill ollamaSkill = new Skill(skillConfig);
@@ -180,7 +186,7 @@ public class OllamaSkillsMgr {
 		return null;
 	}
 	
-	private SkillConfig getSkillConfig(final String aSkillFolder, final String aSkillPropFileName)
+	private SkillConfig getSkillConfig(final String aSkillName, final String aSkillFolder, final String aSkillPropFileName)
 	{
 		Properties prop = loadProperties(aSkillFolder+"/"+aSkillPropFileName);
 		if(prop!=null)
@@ -188,7 +194,7 @@ public class OllamaSkillsMgr {
 			String sSkillPrefix = "skill4j.";
 			String sSkillReqPrefix = sSkillPrefix+"llm.request.";
 			//
-			SkillConfig skillConfig = new SkillConfig(aSkillFolder);
+			SkillConfig skillConfig = new SkillConfig(aSkillName);
 			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"llm.host", DEF_ollama_host));
 			skillConfig.setLLM_model_name(prop.getProperty(sSkillReqPrefix+"model-name", DEF_model_name));
 			//
@@ -302,19 +308,13 @@ public class OllamaSkillsMgr {
 		Skill skill = skillsMgr.getOllamaSkill("hello");
 		if(skill!=null)
 		{
-			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
+			String userprompt = "Explain what is "+skill.getSkillName()+".";
 			System.out.println();
 			System.out.println(skillsMgr.execute(skill, userprompt));
 		}
-		
-		if(skill!=null)
+		else
 		{
-			SkillConfig config = skill.getSkillConfig();
-			config.setLLM_model_name("qwen2.5-coder:1.5b-instruct-q4_K_M");
-			config.setLLM_Options_temperature(0.5f);
-			String userprompt = "Explain what is '"+skill.getSkillName()+"'.";
-			System.out.println();
-			System.out.println(skillsMgr.execute(skill, userprompt));
+			System.err.println("Failed to load skill.");
 		}
 	}
 }
