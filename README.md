@@ -17,8 +17,8 @@ Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented
 **Sample Output:**
 
 ```text
-Executing [skill:[hello] ...
-  - host: mhttp://localhost:11434
+Executing skill:[hello] ...
+  - host: http://localhost:11434
   - mmodel: phi4-mini:3.8b-q4_K_M
   - userPrompt: Explain what is 'hello'.
   - Options: 5
