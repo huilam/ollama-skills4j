@@ -253,12 +253,16 @@ public class OllamaSkillsMgr {
 	}
 	
 
-	public String execute(Skill aSkill, String aUserPrompt) throws Exception
+	public String execute(Skill aSkill, LLMReqInput aReqInput) throws Exception
 	{
 		String sResult = null;
 		
-		if(aSkill!=null && aUserPrompt!=null && aUserPrompt.trim().length()>0)
+		if(aSkill!=null && aReqInput!=null)
 		{
+			String sUserPrompt = aReqInput.getUserPrompt();
+			if(sUserPrompt==null || sUserPrompt.trim().length()==0)
+				throw new Exception("Invalid user prompt.");
+			
 			String FONT_COLOR = OllamaSkillsMgr.CLI_FONT_BLACK;
 			String FONT_DEF = OllamaSkillsMgr.CLI_FONT_DEF;
 			if(!isSilentMode)
@@ -268,7 +272,7 @@ public class OllamaSkillsMgr {
 				System.out.println("Executing "+FONT_COLOR+"skill:["+FONT_DEF+aSkill.getSkillName()+FONT_COLOR+"]"+FONT_DEF+" ...");
 				System.out.println("  - "+FONT_COLOR+"host: "+FONT_DEF+skillConfig.getLLM_host());
 				System.out.println("  - "+FONT_COLOR+"model: "+FONT_DEF+skillConfig.getLLM_model_name());
-				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+aUserPrompt.replaceAll("\n", " "));
+				System.out.println("  - "+FONT_COLOR+"userPrompt: "+FONT_DEF+sUserPrompt.replaceAll("\n", " "));
 				Map<String, Object> optionsMap = skillConfig.getLLM_options().getOptionsMap();
 				System.out.println("  - "+FONT_COLOR+"customOptions: "+FONT_DEF+optionsMap.size());
 				
@@ -282,7 +286,7 @@ public class OllamaSkillsMgr {
 				}
 			}
 			long lTimeMs = System.currentTimeMillis();
-			OllamaResult response = aSkill.sendRequest(aUserPrompt);
+			OllamaResult response = aSkill.sendRequest(aReqInput);
 			sResult = response.getResponse();
 			lTimeMs = System.currentTimeMillis() - lTimeMs;
 			if(!isSilentMode)
@@ -310,7 +314,7 @@ public class OllamaSkillsMgr {
 		{
 			String userprompt = "Explain what is "+skill.getSkillName()+".";
 			System.out.println();
-			System.out.println(skillsMgr.execute(skill, userprompt));
+			System.out.println(skillsMgr.execute(skill, new LLMReqInput(userprompt)));
 		}
 		else
 		{

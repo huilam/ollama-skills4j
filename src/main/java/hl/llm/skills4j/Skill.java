@@ -1,6 +1,7 @@
 package hl.llm.skills4j;
 
 import hl.llm.skills4j.actions.ISkill4jAction;
+import hl.llm.skills4j.ollama.LLMReqInput;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.exceptions.OllamaException;
 import io.github.ollama4j.models.generate.OllamaGenerateRequest;
@@ -33,12 +34,12 @@ public class Skill {
 		return false;
 	}
 
-	public OllamaResult sendRequest(String userprompt) throws OllamaException
+	public OllamaResult sendRequest(LLMReqInput reqInput) throws OllamaException
 	{
-		return sendRequest(userprompt, null);
+		return sendRequest(reqInput, null);
 	}
 	
-	public OllamaResult sendRequest(String userprompt, OllamaGenerateStreamObserver streamObserver) throws OllamaException{
+	public OllamaResult sendRequest(LLMReqInput reqInput, OllamaGenerateStreamObserver streamObserver) throws OllamaException{
         
 		if(isOllamaReady()==false)
 			throw new OllamaException("Ollama is not ready. Please check the host and ensure Ollama is running.");
@@ -48,12 +49,17 @@ public class Skill {
 		
 		if(skillAction!=null)
         {
-			userprompt = skillAction.doPreExecAction(config, userprompt);
+			reqInput = skillAction.doPreExecAction(config, reqInput);
         }
 		
 		OllamaGenerateRequest request = OllamaGenerateRequest.builder()
                 .withModel(config.getLLM_model_name())
-                .withPrompt(userprompt);
+                .withPrompt(reqInput.getUserPrompt());
+		
+		if(reqInput.getImageBase64List()!=null && reqInput.getImageBase64List().size()>0)
+		{
+			request.withImagesBase64(reqInput.getImageBase64List());
+		}
         
         if(config.getLLM_System_prompt()!=null)
         	request.withSystem(config.getLLM_System_prompt());
@@ -67,9 +73,10 @@ public class Skill {
         ///
         OllamaResult ollamaResult = client.generate(request.build(), streamObserver);
         
+        
         if(skillAction!=null)
         {
-        	ollamaResult = skillAction.doPostExecAction(config, userprompt , ollamaResult);
+        	ollamaResult = skillAction.doPostExecAction(config, reqInput , ollamaResult);
 		}
         
         return ollamaResult;
