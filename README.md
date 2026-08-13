@@ -17,9 +17,9 @@ Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented
 **Sample Output:**
 
 ```text
-Executing [skill:[hello] ...
-  - host: mhttp://localhost:11434
-  - mmodel: phi4-mini:3.8b-q4_K_M
+Executing skill:[hello] ...
+  - host: http://localhost:11434
+  - model: phi4-mini:3.8b-q4_K_M
   - userPrompt: Explain what is 'hello'.
   - Options: 5
       * top_p: 0.9
@@ -58,6 +58,19 @@ public static void main(String args[]) throws Exception
 **Sample Skill4j.propeties File:**
 
 ```text
+########################################
+# skill4j.llm.host=http://localhost:11434
+# skill4j.llm.request.model=phi4-mini:3.8b
+# skill4j.llm.request.timeout=30
+# skill4j.llm.request.system-prompt=${file:hello.system-prompt}
+# skill4j.action.implementation=
+#
+# skill4j.llm.options.topK=40
+# skill4j.llm.options.topP=0.9
+# skill4j.llm.options.temperature=0.7
+# skill4j.llm.options.repeatPenalty=1.1
+# skill4j.llm.options.seed=42
+########################################
 skill4j.llm.host=http://localhost:11434
 skill4j.llm.request.model-name=phi4-mini:3.8b-q4_K_M
 skill4j.llm.request.timeout-secs=200
