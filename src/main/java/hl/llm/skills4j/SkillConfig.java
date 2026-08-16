@@ -1,7 +1,5 @@
 package hl.llm.skills4j;
 
-import java.lang.reflect.InvocationTargetException;
-
 import hl.llm.skills4j.actions.ISkill4jAction;
 import io.github.ollama4j.utils.Options;
 import io.github.ollama4j.utils.OptionsBuilder;
@@ -29,43 +27,6 @@ public class SkillConfig {
 	
 	public ISkill4jAction getSkill_action() {
 		return skill_action;
-	}
-
-	public void setSkill_action_classname(String aSkill_action_className) {
-		Exception ex = null;
-		try {
-			setSkill_action((ISkill4jAction) null);
-			Class<?> clazz = Class.forName(aSkill_action_className);
-			Object instance = clazz.getDeclaredConstructor().newInstance();
-			if (instance instanceof ISkill4jAction) {
-				ISkill4jAction actionInstance = (ISkill4jAction) instance;
-				if(actionInstance.init())
-				{
-					this.skill_action = actionInstance;
-					setSkill_action(actionInstance);
-				}
-				
-			} else {
-				throw new IllegalArgumentException("Class " + aSkill_action_className + " does not implement ISkill4jAction.");
-			}
-		} catch (ClassNotFoundException e) {
-			ex = e;
-		} catch (InstantiationException e) {
-			ex = e;
-		} catch (IllegalAccessException e) {
-			ex = e;
-		} catch (IllegalArgumentException e) {
-			ex = e;
-		} catch (InvocationTargetException e) {
-			ex = e;
-		} catch (NoSuchMethodException e) {
-			ex = e;
-		}
-		
-		if(ex!=null)
-		{
-			throw new RuntimeException("Failed to instantiate skill action: " + aSkill_action_className, ex);
-		}
 	}
 	
 	public void setSkill_action(ISkill4jAction skill_action) {

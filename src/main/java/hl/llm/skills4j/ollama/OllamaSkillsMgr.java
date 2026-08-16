@@ -1,12 +1,15 @@
 package hl.llm.skills4j.ollama;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Properties;
 
+import hl.common.ClassLoaderUtil;
 import hl.common.PropUtil;
 import hl.llm.skills4j.Skill;
 import hl.llm.skills4j.SkillConfig;
+import hl.llm.skills4j.actions.ISkill4jAction;
 import io.github.ollama4j.models.response.OllamaResult;
 
 public class OllamaSkillsMgr {
@@ -119,6 +122,7 @@ public class OllamaSkillsMgr {
 		sb.append("# skill4j.llm.request.timeout=").append("30").append("\n");
 		sb.append("# skill4j.llm.request.system-prompt=").append("${file:"+aSkillNameCandidate+".system-prompt}").append("\n");
 		sb.append("# skill4j.action.implementation=").append("\n");
+		sb.append("# skill4j.action.lib-folder=").append("\n");
 		sb.append("#").append("\n");
 		sb.append("# skill4j.llm.options.topK=").append("40").append("\n");
 		sb.append("# skill4j.llm.options.topP=").append("0.9").append("\n");
@@ -209,7 +213,21 @@ public class OllamaSkillsMgr {
 			String sActionClassName = prop.getProperty(sSkillPrefix+"action.implementation", null);
 			if(sActionClassName!=null && sActionClassName.trim().length()>0)
 			{
-				skillConfig.setSkill_action_classname(sActionClassName);
+				String sActionLibFolder = prop.getProperty(sSkillPrefix+"action.lib-folder", null);
+				ClassLoader classLoader = getClass().getClassLoader();
+				if(sActionLibFolder!=null && sActionLibFolder.trim().length()>0)
+				{
+					try {
+						ClassLoader cl = ClassLoaderUtil.createCustomClassLoader(getClass(), sActionLibFolder);
+						classLoader = cl;
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				ISkill4jAction skillAction = initSkill4jAction(classLoader, sActionClassName);
+				skillConfig.setSkill_action(skillAction);
 			}
 			//
 			
@@ -252,6 +270,37 @@ public class OllamaSkillsMgr {
 		return null;
 	}
 	
+
+	public ISkill4jAction initSkill4jAction(ClassLoader aClassLoader, String aSkill_action_className) {
+		Exception ex = null;
+		try {
+			
+			Object instance =  ClassLoaderUtil.newClassInstance(aClassLoader, aSkill_action_className);
+			if (instance instanceof ISkill4jAction) {
+				ISkill4jAction actionInstance = (ISkill4jAction) instance;
+				if(actionInstance.init())
+				{
+					return actionInstance;
+				}
+				
+			} else {
+				throw new IllegalArgumentException("Class " + aSkill_action_className + " does not implement ISkill4jAction.");
+			}
+		} catch (ClassNotFoundException e) {
+			ex = e;
+		} catch (InstantiationException e) {
+			ex = e;
+		} catch (IllegalArgumentException e) {
+			ex = e;
+		} 
+		
+		if(ex!=null)
+		{
+			throw new RuntimeException("Failed to instantiate skill action: " + aSkill_action_className, ex);
+		}
+		
+		return null;
+	}
 
 	public String execute(Skill aSkill, LLMReqInput aReqInput) throws Exception
 	{
@@ -309,7 +358,7 @@ public class OllamaSkillsMgr {
 		skillsMgr.setSilentMode(false);
 		skillsMgr.setDebugMode(true);
 		
-		Skill skill = skillsMgr.getOllamaSkill("hello");
+		Skill skill = skillsMgr.getOllamaSkill("pdf-to-text");
 		if(skill!=null)
 		{
 			String userprompt = "Explain what is "+skill.getSkillName()+".";
