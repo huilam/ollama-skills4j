@@ -4,6 +4,8 @@ A Simple Ollama Skills framework for Java.
 
 Built on top of [Ollama4J](https://github.com/ollama4j/ollama4j) and implemented in Core Java, this library provides a lightweight, easy-to-use framework with a footprint of **less than 6MB** (including Ollama4J dependencies).
 
+It supports custom action implementations by implementing the ISkill4jAction interface. A custom classloader is implemented for each skill action, and all dependency JARs are loaded from the skill's lib folder.
+
 
 **Prerequisites:**
 * **Java 17** or higher (adjust to your actual requirement)
