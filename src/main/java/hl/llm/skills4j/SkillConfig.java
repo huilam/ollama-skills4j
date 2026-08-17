@@ -1,28 +1,48 @@
 package hl.llm.skills4j;
 
+import java.io.File;
+import java.util.Map;
+import java.util.Properties;
+
 import hl.llm.skills4j.actions.ISkill4jAction;
 import io.github.ollama4j.utils.Options;
 import io.github.ollama4j.utils.OptionsBuilder;
 
 public class SkillConfig {
 	
+	
+	public static String DEF_ollama_host 	= "http://localhost:11434";
+	public static String DEF_timeout_ms 	= "30";
+	public static String DEF_model_name 	= "";
+	
 	private String skill_name 			= null;
-	private String llm_host 			= "http://localhost:11434";
+	private File skill_path 			= null;
+	private String llm_host 			= DEF_ollama_host;
 	private String llm_model_name 		= null;
-	private int llm_timeout_secs		= 30;
+	private int llm_timeout_secs		= Integer.parseInt(DEF_timeout_ms);;
 	private String llm_system_prompt	= null;
 	private ISkill4jAction skill_action	= null;
 	
-	private OptionsBuilder llm_options 	= new OptionsBuilder();
+	private OptionsBuilder llm_options 		= new OptionsBuilder();
+	private Map<String, Object> mapProps 	= new java.util.HashMap<String, Object>();
 	
-	public SkillConfig(String aSkillFolder)
+	public SkillConfig(String aSkillName, File aSkillFolder)
 	{
 		clear();
-		this.skill_name = aSkillFolder;
+		this.skill_name = aSkillName;
+		this.skill_path = aSkillFolder;
 	}
 	
 	public String getSkill_name() {
 		return skill_name;
+	}
+	
+	public File getSkillFolderPath() {
+		return skill_path;
+	}
+	
+	public Map<String, Object> getSkill_props() {
+		return mapProps;
 	}
 	
 	public ISkill4jAction getSkill_action() {
@@ -33,14 +53,33 @@ public class SkillConfig {
 		this.skill_action = skill_action;
 	}
 
+	public void addSkill_properties(Properties aProps) {
+		
+		if(aProps!=null && aProps.size()>0)
+		{
+			for(String key : aProps.stringPropertyNames())
+			{
+				String value = aProps.getProperty(key);
+				if(value!=null)
+					mapProps.put(key, value);
+			}
+		}
+	}
+	
+	public void addSkill_props(String key, Object value) {
+		this.mapProps.put(key, value);
+	}
+	
+	
 	public void clear() {
-		this.llm_host 		= "http://localhost:11434";
+		this.llm_host 			= DEF_ollama_host;
 		this.llm_model_name 	= null;
-		this.llm_timeout_secs	= 30;
+		this.llm_timeout_secs	= Integer.parseInt(DEF_timeout_ms);
 		this.llm_options		= new OptionsBuilder();
 		this.llm_system_prompt	= null;
 		
 		this.skill_action 		= null;
+		this.mapProps 			= new java.util.HashMap<String, Object>();
 	}
 
 	public String getLLM_host() {
@@ -70,6 +109,7 @@ public class SkillConfig {
 			setLLM_timeout_secs(iSecs);
 		}catch (NumberFormatException e) {
 			e.printStackTrace();
+			setLLM_timeout_secs(Integer.parseInt(DEF_timeout_ms));
 		}
 	}
 
@@ -116,7 +156,6 @@ public class SkillConfig {
 	}
 	//
 
-
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
@@ -126,6 +165,7 @@ public class SkillConfig {
 		sb.append("  llm_timeout_secs: "+llm_timeout_secs+"\n");
 		sb.append("  llm_options: "+llm_options.toString()+"\n");
 		sb.append("  llm_system_prompt: "+llm_system_prompt+"\n");
+		sb.append("  mapProps: "+mapProps.toString()+"\n");
 		sb.append("  skill_action: "+(skill_action!=null?skill_action.getClass().getName():null)+"\n");
 		return sb.toString();
 	}

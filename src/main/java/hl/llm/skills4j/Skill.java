@@ -1,5 +1,8 @@
 package hl.llm.skills4j;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import hl.llm.skills4j.actions.ISkill4jAction;
 import hl.llm.skills4j.ollama.LLMReqInput;
 import io.github.ollama4j.Ollama;
@@ -56,9 +59,10 @@ public class Skill {
                 .withModel(config.getLLM_model_name())
                 .withPrompt(reqInput.getUserPrompt());
 		
-		if(reqInput.getImageBase64List()!=null && reqInput.getImageBase64List().size()>0)
+		if(reqInput.getImageBase64Map()!=null && reqInput.getImageBase64Map().size()>0)
 		{
-			request.withImagesBase64(reqInput.getImageBase64List());
+			List<String> listImgBase64 = new ArrayList<>(reqInput.getImageBase64Map().keySet());
+			request.withImagesBase64(listImgBase64);
 		}
         
         if(config.getLLM_System_prompt()!=null)

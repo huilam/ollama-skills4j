@@ -1,5 +1,6 @@
 package hl.llm.skills4j.ollama;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Map;
@@ -23,10 +24,7 @@ public class OllamaSkillsMgr {
 	private String frameworkPropFileName 			= "ollama-skills4j.properties";
 	private static String frameworkPropPrefix 		= "ollama-skills4j.";
 	private static String DEF_skill_config_filename = "skill4j.properties";
-	
-	private static String DEF_ollama_host 	= "http://localhost:11434";
-	private static String DEF_timeout_ms 	= "10";
-	private static String DEF_model_name 	= "";
+
 	
 	private Properties propSkillConfig = null;
 	public boolean isDebugMode 	= false;
@@ -198,11 +196,15 @@ public class OllamaSkillsMgr {
 			String sSkillPrefix = "skill4j.";
 			String sSkillReqPrefix = sSkillPrefix+"llm.request.";
 			//
-			SkillConfig skillConfig = new SkillConfig(aSkillName);
-			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"llm.host", DEF_ollama_host));
-			skillConfig.setLLM_model_name(prop.getProperty(sSkillReqPrefix+"model-name", DEF_model_name));
+			String sSkillFolder = prop.getProperty(PropUtil.LIB_PROP_KEY_PROP_PATH);
 			//
-			skillConfig.setLLM_timeout_secs(prop.getProperty(sSkillReqPrefix+"timeout-secs", DEF_timeout_ms));
+			SkillConfig skillConfig = new SkillConfig(aSkillName, new File(sSkillFolder));			
+			
+			skillConfig.addSkill_properties(prop); //for custom action implementation 
+			skillConfig.setLLM_host(prop.getProperty(sSkillPrefix+"llm.host", null));
+			skillConfig.setLLM_model_name(prop.getProperty(sSkillReqPrefix+"model-name", null));
+			//
+			skillConfig.setLLM_timeout_secs(prop.getProperty(sSkillReqPrefix+"timeout-secs", null));
 			//
 			String sSystemPrompt = prop.getProperty(sSkillReqPrefix+"system-prompt", null);
 			if(sSystemPrompt!=null && sSystemPrompt.trim().length()>0)
@@ -355,13 +357,13 @@ public class OllamaSkillsMgr {
 	{
 		OllamaSkillsMgr skillsMgr = new OllamaSkillsMgr();
 		
-		skillsMgr.setSilentMode(false);
+		skillsMgr.setSilentMode(true);
 		skillsMgr.setDebugMode(true);
 		
 		Skill skill = skillsMgr.getOllamaSkill("pdf-to-text");
 		if(skill!=null)
 		{
-			String userprompt = "Explain what is "+skill.getSkillName()+".";
+			String userprompt = "Describe this document.";
 			System.out.println();
 			System.out.println(skillsMgr.execute(skill, new LLMReqInput(userprompt)));
 		}

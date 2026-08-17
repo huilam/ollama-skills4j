@@ -1,12 +1,14 @@
 package hl.llm.skills4j.ollama;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LLMReqInput {
 	
 	private String userPrompt = null;
-	private List<String> listImgBase64 = new ArrayList<>();
+	private Map<String, String> mapImgBase64 = new HashMap<>();
 	
 	public LLMReqInput(String userPrompt) {
 		this.userPrompt = userPrompt;
@@ -20,19 +22,19 @@ public class LLMReqInput {
 		this.userPrompt = userPrompt;
 	}
 	
-	public List<String> getImageBase64List() {
-		return this.listImgBase64;
+	public Map<String, String> getImageBase64Map() {
+		return this.mapImgBase64;
 	}
 	
-	public void setImageBase64List(List<String> aListImgBase64) {
-		this.listImgBase64 = aListImgBase64;
+	public void setImageBase64Map(Map<String, String> aMapImgBase64) {
+		this.mapImgBase64 = aMapImgBase64;
 	}
 	
-	public void clearImageBase64List() {
-		this.listImgBase64.clear();
+	public void clearImageBase64Map() {
+		this.mapImgBase64.clear();
 	}
 	
-	public void addImageBase64(String aImageBase64) {
-		this.listImgBase64.add(aImageBase64);
+	public void addImageBase64(String aImageBase64, String aImageMeta) {
+		this.mapImgBase64.put(aImageBase64, aImageMeta);
 	}
 }
