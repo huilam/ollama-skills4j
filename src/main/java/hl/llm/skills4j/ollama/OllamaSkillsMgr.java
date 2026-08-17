@@ -367,8 +367,9 @@ public class OllamaSkillsMgr {
 			
 			String userprompt = "Explain what is '"+skill.getSkillName()+"' in 1 sentence.";
 			System.out.println();
-			System.out.println("skill-fname:"+skill.getSkillName());
+			System.out.println("skill-name:["+skill.getSkillName()+"]");
 			System.out.println("skill-folder:"+skill.getSkillConfig().getSkillFolderPath());
+			System.out.println();
 			System.out.println(skillsMgr.execute(skill, new LLMReqInput(userprompt)));
 			
 			
